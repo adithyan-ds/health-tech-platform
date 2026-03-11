@@ -29,8 +29,12 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Your frontend URL
-    methods: ["GET", "POST"]
+    origin: [
+      "http://localhost:5173", 
+      "https://health-tech-platform-two.vercel.app" // 👈 Your new Vercel URL
+    ],
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
