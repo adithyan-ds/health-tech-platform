@@ -34,6 +34,7 @@ const AdminDashboard = () => {
   const [complaints, setComplaints] = useState([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [activeTab, setActiveTab] = useState("overview");
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Certificate Modal State
   const [isCertModalOpen, setIsCertModalOpen] = useState(false);
@@ -177,6 +178,13 @@ const AdminDashboard = () => {
     setSelectedDoctor(null);
     setIsCertModalOpen(false);
   };
+  // 👇 Add this block right before your return statement
+  const filteredPatients = patients.filter((p) =>
+    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  
 
   // --- COMPONENT: STAT CARD ---
   
@@ -294,28 +302,44 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        {/* PATIENTS TAB */}
+       {/* PATIENTS TAB */}
         {activeTab === "patients" && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
              <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
                 <h3 className="font-semibold text-gray-700">Patient Directory</h3>
                 <div className="relative">
                   <Search size={16} className="absolute left-3 top-2.5 text-gray-400"/>
-                  <input type="text" placeholder="Search patients..." className="pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-blue-500 w-64"/>
+                  {/* 👇 Added value and onChange here */}
+                  <input 
+                    type="text" 
+                    placeholder="Search patients by name or email..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-blue-500 w-64"
+                  />
                 </div>
              </div>
              <table className="w-full text-left">
               <thead className="bg-white text-gray-500 text-xs uppercase border-b">
-                <tr><th className="p-4">Name</th><th className="p-4">Email</th><th className="p-4">Date</th></tr>
+                <tr><th className="p-4">Name</th><th className="p-4">Email</th><th className="p-4">Date Joined</th></tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {patients.map((p) => (
-                  <tr key={p._id} className="hover:bg-gray-50">
-                    <td className="p-4 font-medium">{p.name}</td>
-                    <td className="p-4 text-gray-500">{p.email}</td>
-                    <td className="p-4 text-gray-400 text-sm">{new Date(p.createdAt).toLocaleDateString()}</td>
+                {/* 👇 Changed patients.map to filteredPatients.map */}
+                {filteredPatients.length > 0 ? (
+                  filteredPatients.map((p) => (
+                    <tr key={p._id} className="hover:bg-gray-50">
+                      <td className="p-4 font-medium">{p.name}</td>
+                      <td className="p-4 text-gray-500">{p.email}</td>
+                      <td className="p-4 text-gray-400 text-sm">{new Date(p.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="3" className="p-8 text-center text-gray-500">
+                      No patients found matching "{searchTerm}"
+                    </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
